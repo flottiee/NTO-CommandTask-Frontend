@@ -10,17 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,8 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import ru.myitschool.work.core.TestIds
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun BookScreen(
@@ -54,7 +52,7 @@ fun BookScreen(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.testTag(TestIds.Book.BACK_BUTTON)
             ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         }
     ) { paddingValues ->
@@ -94,7 +92,7 @@ fun BookScreen(
                 }
                 is BookState.Data -> {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        ScrollableTabRow(
+                        PrimaryScrollableTabRow(
                             selectedTabIndex = currentState.selectedDateIndex,
                             edgePadding = 0.dp
                         ) {

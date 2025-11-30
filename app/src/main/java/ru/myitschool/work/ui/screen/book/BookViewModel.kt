@@ -55,20 +55,11 @@ class BookViewModel : ViewModel() {
             _uiState.update { BookState.Loading }
             BookRepository.getAvailableBookings().fold(
                 onSuccess = { days ->
-                    // Filter out days with no places if necessary, though the API might do it
                     val validDays = days.filter { it.places.isNotEmpty() }.sortedBy { 
                         try {
-                            val parts = it.date.split("-") // API likely returns YYYY-MM-DD or similar, 
-                            // actually README says "format dd.MM.yyyy" for MainScreen, but BookScreen says "dd.MM" for display. 
-                            // Let's assume standard sorting works or we need to parse. 
-                            // Based on problem description "5 января -> 6 января", simple string sort might not work if format is dd.MM.yyyy
-                            // But API usually returns ISO 8601 YYYY-MM-DD. Let's check Models.
-                            // Wait, MainScreen format is dd.MM.yyyy. BookScreen says display format dd.MM.
-                            // The API likely returns consistent format. If it is dd.MM.yyyy, we need to parse to sort.
-                            // Let's try to parse assuming dd.MM.yyyy
-                             val p = it.date.split(".")
-                             if (p.size == 3) {
-                                 p[2].toInt() * 10000 + p[1].toInt() * 100 + p[0].toInt()
+                            val parts = it.date.split(".")
+                             if (parts.size == 3) {
+                                 parts[2].toInt() * 10000 + parts[1].toInt() * 100 + parts[0].toInt()
                              } else {
                                  0
                              }
@@ -89,8 +80,8 @@ class BookViewModel : ViewModel() {
                         }
                     }
                 },
-                onFailure = {
-                    _uiState.update { BookState.Error(it.message) }
+                onFailure = { e ->
+                    _uiState.update { BookState.Error(e.message) }
                 }
             )
         }
@@ -123,15 +114,13 @@ class BookViewModel : ViewModel() {
             val place = currentState.selectedPlace ?: return
 
             viewModelScope.launch {
-                 // We might want to show loading, but usually we just wait.
-                 // Or we could set a "booking" state.
-                 // For now let's just call API.
+                _uiState.update { BookState.Loading }
                 BookRepository.bookPlace(date, place).fold(
                     onSuccess = {
                         _actionFlow.emit(Unit)
                     },
-                    onFailure = {
-                        _uiState.update { BookState.Error(it.message) }
+                    onFailure = { e ->
+                        _uiState.update { BookState.Error(e.message) }
                     }
                 )
             }

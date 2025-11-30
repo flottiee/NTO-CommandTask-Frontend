@@ -1,6 +1,5 @@
 package ru.myitschool.work.ui.screen.main
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,15 +29,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import ru.myitschool.work.core.TestIds
 import ru.myitschool.work.ui.nav.BookScreenDestination
 import ru.myitschool.work.ui.nav.AuthScreenDestination
@@ -181,14 +177,6 @@ fun MainScreen(
                                 }
                             }
                         }
-                        
-                        // Add hidden error field as per requirements
-                        // "По умолчанию скрытое текстовое поле с ошибкой (main_error)."
-                        // It should only show on error, but MainState.Error handles full screen error.
-                        // However, if there is a partial error or just hidden field requirement?
-                        // Specs say: "В случае любой ошибки необходимо скрыть все элементы, кроме текстового поля с ошибкой и кнопки обновления данных."
-                        // This is handled in MainState.Error branch.
-                        
                     }
                 }
             }
