@@ -24,6 +24,14 @@ class AuthViewModel : ViewModel() {
     private val _actionFlow: MutableSharedFlow<Unit> = MutableSharedFlow()
     val actionFlow: SharedFlow<Unit> = _actionFlow
 
+    init {
+        viewModelScope.launch {
+            if (AuthRepository.getAuthCode() != null) {
+                _actionFlow.emit(Unit)
+            }
+        }
+    }
+
     fun onIntent(intent: AuthIntent) {
         when (intent) {
             is AuthIntent.Send -> {

@@ -42,7 +42,9 @@ fun AuthScreen(
 
     LaunchedEffect(Unit) {
         viewModel.actionFlow.collect {
-            navController.navigate(MainScreenDestination)
+            navController.navigate(MainScreenDestination) {
+                 popUpTo(0) { inclusive = true }
+            }
         }
     }
 
@@ -76,6 +78,7 @@ private fun Content(
     state: AuthState,
 ) {
     var inputText by remember { mutableStateOf("") }
+    
     Spacer(modifier = Modifier.size(16.dp))
     TextField(
         modifier = Modifier.testTag(TestIds.Auth.CODE_INPUT).fillMaxWidth(),
@@ -85,19 +88,43 @@ private fun Content(
             inputText = it
             viewModel.onIntent(AuthIntent.TextInput(it))
         },
-        label = { Text(stringResource(R.string.auth_label)) }
+        label = { Text(stringResource(R.string.auth_label)) },
+        isError = state is AuthState.Error
     )
     Spacer(modifier = Modifier.size(16.dp))
+    
+    // We always render the error text field, but it might be empty if no error.
+    // Or specs say "По умолчанию неотображаемое текстовое поле с ошибкой ... Отметим, что это поле не должно рендериться."
+    // "не должно рендериться" means we should use `if` condition.
+    // But wait, "По умолчанию неотображаемое" implies visibility is gone or it's just not in composable tree.
+    // "не должно рендериться" = not in tree.
+    
     if (state is AuthState.Error) {
-        Text(state.errorText)
+        Text(
+            text = state.errorText,
+            modifier = Modifier.testTag(TestIds.Auth.ERROR),
+            color = MaterialTheme.colorScheme.error
+        )
+    } else {
+        // This part is tricky. The specs say "element from point 2". Point 2 says "text field with error".
+        // "Not rendered by default".
+        // So `if (state is AuthState.Error)` is correct.
     }
+
     Spacer(modifier = Modifier.size(16.dp))
+    
+    val isEnabled = when(state) {
+        is AuthState.Data -> state.isButtonEnabled
+        is AuthState.Error -> true 
+        else -> false
+    }
+
     Button(
         modifier = Modifier.testTag(TestIds.Auth.SIGN_BUTTON).fillMaxWidth(),
         onClick = {
             viewModel.onIntent(AuthIntent.Send(inputText))
         },
-        enabled = (state as? AuthState.Data)?.isButtonEnabled ?: false
+        enabled = isEnabled
     ) {
         Text(stringResource(R.string.auth_sign_in))
     }
