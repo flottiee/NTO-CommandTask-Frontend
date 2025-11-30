@@ -26,11 +26,11 @@ data class BookingInfo(
 
 data class DayAvailability(
     val date: String,
-    val places: List<BookingInfo>
+    val bookings: List<BookingInfo>
 )
 
 @Serializable
 data class BookingRequest(
     val date: String,
-    val place: String
+    val placeID: Long
 )

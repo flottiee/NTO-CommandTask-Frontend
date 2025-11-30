@@ -120,21 +120,21 @@ fun BookScreen(
                                     .padding(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                itemsIndexed(currentDay.places) { index, place ->
-                                    val isSelected = currentState.selectedPlace == place.place
+                                itemsIndexed(currentDay.bookings) { index, booking ->
+                                    val isSelected = currentState.selectedPlace == booking.id
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag(TestIds.Book.getIdPlaceItemByPosition(index))
                                             .selectable(
                                                 selected = isSelected,
-                                                onClick = { viewModel.onIntent(BookIntent.SelectPlace(place.place)) }
+                                                onClick = { viewModel.onIntent(BookIntent.SelectPlace(booking.id)) }
                                             )
                                             .padding(8.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = place.place,
+                                            text = booking.place,
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .testTag(TestIds.Book.ITEM_PLACE_TEXT)

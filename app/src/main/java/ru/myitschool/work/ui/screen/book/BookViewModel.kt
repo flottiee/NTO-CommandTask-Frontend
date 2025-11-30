@@ -17,7 +17,7 @@ sealed interface BookState {
     data class Data(
         val availableDays: List<DayAvailability>,
         val selectedDateIndex: Int = 0,
-        val selectedPlace: String? = null
+        val selectedPlace: Long? = null
     ) : BookState
     data class Error(val message: String? = null) : BookState
     object Empty : BookState
@@ -26,7 +26,7 @@ sealed interface BookState {
 sealed interface BookIntent {
     object Refresh : BookIntent
     data class SelectDate(val index: Int) : BookIntent
-    data class SelectPlace(val place: String) : BookIntent
+    data class SelectPlace(val placeId: Long) : BookIntent
     object Book : BookIntent
 }
 
@@ -45,7 +45,7 @@ class BookViewModel : ViewModel() {
         when (intent) {
             is BookIntent.Refresh -> loadData()
             is BookIntent.SelectDate -> selectDate(intent.index)
-            is BookIntent.SelectPlace -> selectPlace(intent.place)
+            is BookIntent.SelectPlace -> selectPlace(intent.placeId)
             is BookIntent.Book -> bookPlace()
         }
     }
@@ -57,9 +57,9 @@ class BookViewModel : ViewModel() {
                 onSuccess = { bookings ->
                     val days = bookings.map { DayAvailability(
                         date = it.key,
-                        places = it.value
+                        bookings = it.value
                     ) }
-                    val validDays = days.filter { it.places.isNotEmpty() }.sortedBy {
+                    val validDays = days.filter { it.bookings.isNotEmpty() }.sortedBy {
                         try {
                             val parts = it.date.split(".")
                              if (parts.size == 3) {
@@ -101,10 +101,10 @@ class BookViewModel : ViewModel() {
         }
     }
 
-    private fun selectPlace(place: String) {
+    private fun selectPlace(placeId: Long) {
         _uiState.update { currentState ->
             if (currentState is BookState.Data) {
-                currentState.copy(selectedPlace = place)
+                currentState.copy(selectedPlace = placeId)
             } else {
                 currentState
             }
@@ -115,11 +115,11 @@ class BookViewModel : ViewModel() {
         val currentState = _uiState.value
         if (currentState is BookState.Data) {
             val date = currentState.availableDays[currentState.selectedDateIndex].date
-            val place = currentState.selectedPlace ?: return
+            val placeID = currentState.selectedPlace ?: return
 
             viewModelScope.launch {
                 _uiState.update { BookState.Loading }
-                BookRepository.bookPlace(date, place).fold(
+                BookRepository.bookPlace(date, placeID).fold(
                     onSuccess = {
                         _actionFlow.emit(Unit)
                     },

@@ -74,11 +74,11 @@ object NetworkDataSource {
         }
     }
 
-    suspend fun bookPlace(code: String, date: String, place: String): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun bookPlace(code: String, date: String, placeID: Long): Result<Unit> = withContext(Dispatchers.IO) {
         return@withContext runCatching {
             val response = client.post(getUrl(code, Constants.BOOK_URL)) {
                 contentType(ContentType.Application.Json)
-                setBody(BookingRequest(date, place))
+                setBody(BookingRequest(date, placeID))
             }
             if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
                 return@runCatching

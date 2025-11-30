@@ -9,8 +9,8 @@ object BookRepository {
         return NetworkDataSource.getAvailableBookings(code)
     }
 
-    suspend fun bookPlace(date: String, place: String): Result<Unit> {
+    suspend fun bookPlace(date: String, placeID: Long): Result<Unit> {
         val code = AuthRepository.getAuthCode() ?: return Result.failure(Exception("No auth code"))
-        return NetworkDataSource.bookPlace(code, date, place)
+        return NetworkDataSource.bookPlace(code, date, placeID)
     }
 }
