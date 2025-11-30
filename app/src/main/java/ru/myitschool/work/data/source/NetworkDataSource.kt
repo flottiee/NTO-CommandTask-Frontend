@@ -67,6 +67,7 @@ object NetworkDataSource {
         return@withContext runCatching {
             val response = client.get(getUrl(code, Constants.INFO_URL))
             if (response.status == HttpStatusCode.OK) {
+                Log.d("TAG", "response: ${response.body<String>()}")
                 response.body()
             } else {
                 error(response.bodyAsText())

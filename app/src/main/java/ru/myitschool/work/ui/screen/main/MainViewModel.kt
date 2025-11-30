@@ -1,5 +1,6 @@
 package ru.myitschool.work.ui.screen.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.myitschool.work.data.model.Booking
 import ru.myitschool.work.data.repo.MainRepository
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -36,7 +38,15 @@ class MainViewModel : ViewModel() {
             _uiState.update { MainState.Loading }
             MainRepository.getUserInfo().fold(
                 onSuccess = { userInfo ->
-                    val sortedBookings = userInfo.bookings.sortedBy {
+                    Log.d("MainViewModel", "userInfo: $userInfo")
+                    val sortedBookings = userInfo.bookings.map {
+                        Booking(
+                            date = it.key,
+                            id = it.value.id,
+                            place = it.value.place
+                        )
+                    }.toList().sortedBy {
+                        // Sort by date.
                         // API dates might be ISO (yyyy-MM-dd) or dd.MM.yyyy
                         // Requirements say "dd.MM.yyyy" is for display.
                         // If API returns yyyy-MM-dd, we should parse that.
@@ -48,12 +58,13 @@ class MainViewModel : ViewModel() {
                         // Let's assume standard sorting by string works if it's ISO.
                         // If it's dd.MM.yyyy, string sort is wrong (01.02 vs 02.01).
                         // Let's implement robust parsing.
-                        
+
                         try {
                             if (it.date.contains("-")) {
                                 LocalDate.parse(it.date, DateTimeFormatter.ISO_DATE).toEpochDay()
                             } else if (it.date.contains(".")) {
-                                LocalDate.parse(it.date, DateTimeFormatter.ofPattern("dd.MM.yyyy")).toEpochDay()
+                                LocalDate.parse(it.date, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                                    .toEpochDay()
                             } else {
                                 0L
                             }
