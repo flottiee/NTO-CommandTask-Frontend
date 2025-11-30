@@ -1,6 +1,7 @@
 package ru.myitschool.work.ui.screen.main
 
 import ru.myitschool.work.data.model.Booking
+import ru.myitschool.work.data.model.BookingInfo
 
 sealed interface MainState {
     object Loading : MainState
