@@ -24,10 +24,9 @@ data class BookingInfo(
     val place: String
 )
 
-@Serializable
 data class DayAvailability(
     val date: String,
-    val places: List<String>
+    val places: List<BookingInfo>
 )
 
 @Serializable

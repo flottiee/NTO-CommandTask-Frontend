@@ -54,8 +54,12 @@ class BookViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { BookState.Loading }
             BookRepository.getAvailableBookings().fold(
-                onSuccess = { days ->
-                    val validDays = days.filter { it.places.isNotEmpty() }.sortedBy { 
+                onSuccess = { bookings ->
+                    val days = bookings.map { DayAvailability(
+                        date = it.key,
+                        places = it.value
+                    ) }
+                    val validDays = days.filter { it.places.isNotEmpty() }.sortedBy {
                         try {
                             val parts = it.date.split(".")
                              if (parts.size == 3) {

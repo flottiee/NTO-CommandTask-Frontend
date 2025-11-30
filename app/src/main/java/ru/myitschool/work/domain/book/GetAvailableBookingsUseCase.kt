@@ -7,6 +7,6 @@ class GetAvailableBookingsUseCase(
     private val repository: BookRepository
 ) {
     suspend operator fun invoke(): Result<List<DayAvailability>> {
-        return repository.getAvailableBookings()
+        return TODO()// repository.getAvailableBookings()
     }
 }
