@@ -33,8 +33,7 @@ class AuthViewModel : ViewModel() {
                         },
                         onFailure = { error ->
                             error.printStackTrace()
-                            _uiState.update { AuthState.Error(error.message ?: "error") }
-                            _actionFlow.emit(Unit)
+                            _uiState.update { AuthState.Error(error.message?.ifEmpty { "error" } ?: "null error") }
                         }
                     )
                 }

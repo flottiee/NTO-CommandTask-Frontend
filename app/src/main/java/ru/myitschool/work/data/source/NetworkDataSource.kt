@@ -1,5 +1,6 @@
 package ru.myitschool.work.data.source
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -30,9 +31,12 @@ object NetworkDataSource {
 
     suspend fun checkAuth(code: String): Result<Boolean> = withContext(Dispatchers.IO) {
         return@withContext runCatching {
+            Log.d("TAG", "request: $code")
             val response = client.get(getUrl(code, Constants.AUTH_URL))
+            Log.d("TAG", "response: ${response.status}")
             when (response.status) {
                 HttpStatusCode.OK -> true
+                HttpStatusCode.Unauthorized -> error("Auth error")
                 else -> error(response.bodyAsText())
             }
         }
