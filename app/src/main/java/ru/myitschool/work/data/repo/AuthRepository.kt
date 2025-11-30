@@ -3,6 +3,7 @@ package ru.myitschool.work.data.repo
 import kotlinx.coroutines.flow.first
 import ru.myitschool.work.App
 import ru.myitschool.work.data.source.NetworkDataSource
+import ru.myitschool.work.data.source.PreferencesDataSource
 
 object AuthRepository {
 
