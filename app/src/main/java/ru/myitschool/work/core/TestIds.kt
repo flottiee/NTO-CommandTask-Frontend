@@ -11,7 +11,7 @@ object TestIds {
         const val ADD_BUTTON = "main_add_button"
         const val REFRESH_BUTTON = "main_refresh_button"
         const val LOGOUT_BUTTON = "main_logout_button"
-        const val PROFILE_IMAGE = "main_image"
+        const val PROFILE_IMAGE = "main_photo"
         const val PROFILE_NAME = "main_name"
         const val ITEM_PLACE = "main_item_place"
         const val ITEM_DATE = "main_item_date"

@@ -22,6 +22,14 @@ class AuthViewModel : ViewModel() {
     private val _actionFlow: MutableSharedFlow<Unit> = MutableSharedFlow()
     val actionFlow: SharedFlow<Unit> = _actionFlow
 
+    init {
+        viewModelScope.launch {
+            if (AuthRepository.getAuthCode() != null) {
+                _actionFlow.emit(Unit)
+            }
+        }
+    }
+
     fun onIntent(intent: AuthIntent) {
         when (intent) {
             is AuthIntent.Send -> {
@@ -34,7 +42,7 @@ class AuthViewModel : ViewModel() {
                         onFailure = { error ->
                             error.printStackTrace()
                             _uiState.update { AuthState.Error(error.message ?: "error") }
-                            _actionFlow.emit(Unit)
+                            // removed _actionFlow.emit(Unit)
                         }
                     )
                 }
