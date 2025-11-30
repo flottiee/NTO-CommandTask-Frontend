@@ -24,14 +24,13 @@ data class BookingInfo(
     val place: String
 )
 
-@Serializable
 data class DayAvailability(
     val date: String,
-    val places: List<String>
+    val bookings: List<BookingInfo>
 )
 
 @Serializable
 data class BookingRequest(
     val date: String,
-    val place: String
+    val placeID: Long
 )

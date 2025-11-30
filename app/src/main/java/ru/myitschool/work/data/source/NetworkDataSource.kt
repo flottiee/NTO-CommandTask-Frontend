@@ -17,8 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import ru.myitschool.work.core.Constants
+import ru.myitschool.work.data.model.BookingInfo
 import ru.myitschool.work.data.model.BookingRequest
-import ru.myitschool.work.data.model.DayAvailability
 import ru.myitschool.work.data.model.UserInfo
 
 object NetworkDataSource {
@@ -50,19 +50,6 @@ object NetworkDataSource {
         }
     }
 
-    suspend fun getInfo(code: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        return@withContext runCatching {
-            Log.d("TAG", "request: $code")
-            val response = client.get(getUrl(code, Constants.INFO_URL))
-            Log.d("TAG", "response: ${response.status}")
-            when (response.status) {
-                HttpStatusCode.OK -> true
-                HttpStatusCode.Unauthorized -> error("Auth error")
-                else -> error(response.bodyAsText())
-            }
-        }
-    }
-
     suspend fun getUserInfo(code: String): Result<UserInfo> = withContext(Dispatchers.IO) {
         return@withContext runCatching {
             val response = client.get(getUrl(code, Constants.INFO_URL))
@@ -75,10 +62,11 @@ object NetworkDataSource {
         }
     }
 
-    suspend fun getAvailableBookings(code: String): Result<List<DayAvailability>> = withContext(Dispatchers.IO) {
+    suspend fun getAvailableBookings(code: String): Result<Map<String, List<BookingInfo>>> = withContext(Dispatchers.IO) {
         return@withContext runCatching {
             val response = client.get(getUrl(code, Constants.BOOKING_URL))
             if (response.status == HttpStatusCode.OK) {
+                Log.d("TAG", "response: ${response.body<String>()}")
                 response.body()
             } else {
                 error(response.bodyAsText())
@@ -86,11 +74,11 @@ object NetworkDataSource {
         }
     }
 
-    suspend fun bookPlace(code: String, date: String, place: String): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun bookPlace(code: String, date: String, placeID: Long): Result<Unit> = withContext(Dispatchers.IO) {
         return@withContext runCatching {
             val response = client.post(getUrl(code, Constants.BOOK_URL)) {
                 contentType(ContentType.Application.Json)
-                setBody(BookingRequest(date, place))
+                setBody(BookingRequest(date, placeID))
             }
             if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
                 return@runCatching

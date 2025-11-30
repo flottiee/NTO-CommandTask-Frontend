@@ -1,16 +1,16 @@
 package ru.myitschool.work.data.repo
 
-import ru.myitschool.work.data.model.DayAvailability
+import ru.myitschool.work.data.model.BookingInfo
 import ru.myitschool.work.data.source.NetworkDataSource
 
 object BookRepository {
-    suspend fun getAvailableBookings(): Result<List<DayAvailability>> {
+    suspend fun getAvailableBookings(): Result<Map<String, List<BookingInfo>>> {
         val code = AuthRepository.getAuthCode() ?: return Result.failure(Exception("No auth code"))
         return NetworkDataSource.getAvailableBookings(code)
     }
 
-    suspend fun bookPlace(date: String, place: String): Result<Unit> {
+    suspend fun bookPlace(date: String, placeID: Long): Result<Unit> {
         val code = AuthRepository.getAuthCode() ?: return Result.failure(Exception("No auth code"))
-        return NetworkDataSource.bookPlace(code, date, place)
+        return NetworkDataSource.bookPlace(code, date, placeID)
     }
 }
