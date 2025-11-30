@@ -1,5 +1,6 @@
 package ru.myitschool.work.ui.screen.main
 
+import android.os.Message
 import ru.myitschool.work.data.model.Booking
 import ru.myitschool.work.data.model.BookingInfo
 
@@ -10,5 +11,5 @@ sealed interface MainState {
         val avatar: String?,
         val bookings: List<Booking>
     ) : MainState
-    object Error : MainState
+    data class Error(val message: String) : MainState
 }

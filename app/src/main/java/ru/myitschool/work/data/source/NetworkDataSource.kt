@@ -8,6 +8,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -42,52 +43,64 @@ object NetworkDataSource {
             Log.d("TAG", "request: $code")
             val response = client.get(getUrl(code, Constants.AUTH_URL))
             Log.d("TAG", "response: ${response.status}")
-            when (response.status) {
-                HttpStatusCode.OK -> true
-                HttpStatusCode.Unauthorized -> error("кода не существует")
-                HttpStatusCode.BadRequest -> error("что-то пошло не так")
-                else -> error(response.bodyAsText())
-            }
+            checkResponse(response) { true }
+//            when (response.status) {
+//                HttpStatusCode.OK -> true
+//                HttpStatusCode.Unauthorized -> error("кода не существует")
+//                HttpStatusCode.BadRequest -> error("что-то пошло не так")
+//                else -> error(response.bodyAsText())
+//            }
         }
     }
 
     suspend fun getUserInfo(code: String): Result<UserInfo> = withContext(Dispatchers.IO) {
         return@withContext runCatching {
             val response = client.get(getUrl(code, Constants.INFO_URL))
-            if (response.status == HttpStatusCode.OK) {
-                Log.d("TAG", "response: ${response.body<String>()}")
-                response.body()
-            } else {
-                error(response.bodyAsText())
-            }
+            checkResponse(response) { response.body() }
         }
     }
 
-    suspend fun getAvailableBookings(code: String): Result<Map<String, List<BookingInfo>>> = withContext(Dispatchers.IO) {
-        return@withContext runCatching {
-            val response = client.get(getUrl(code, Constants.BOOKING_URL))
-            if (response.status == HttpStatusCode.OK) {
-                Log.d("TAG", "response: ${response.body<String>()}")
-                response.body()
-            } else {
-                error(response.bodyAsText())
-            }
-        }
+    private suspend fun <T> checkResponse(
+        response: HttpResponse,
+        getBody: suspend (HttpResponse) -> T
+    ): T = when (response.status) {
+        HttpStatusCode.OK,
+        HttpStatusCode.Created -> getBody(response)
+
+        HttpStatusCode.Unauthorized -> error("кода не существует")
+        HttpStatusCode.BadRequest -> error("что-то пошло не так")
+        else -> error(response.bodyAsText())
     }
 
-    suspend fun bookPlace(code: String, date: String, placeID: Long): Result<Unit> = withContext(Dispatchers.IO) {
-        return@withContext runCatching {
-            val response = client.post(getUrl(code, Constants.BOOK_URL)) {
-                contentType(ContentType.Application.Json)
-                setBody(BookingRequest(date, placeID))
-            }
-            if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
-                return@runCatching
-            } else {
-                error(response.bodyAsText())
+    suspend fun getAvailableBookings(code: String): Result<Map<String, List<BookingInfo>>> =
+        withContext(Dispatchers.IO) {
+            return@withContext runCatching {
+                val response = client.get(getUrl(code, Constants.BOOKING_URL))
+                checkResponse(response) { response.body() }
+//            if (response.status == HttpStatusCode.OK) {
+//                Log.d("TAG", "response: ${response.body<String>()}")
+//                response.body()
+//            } else {
+//                error(response.bodyAsText())
+//            }
             }
         }
-    }
+
+    suspend fun bookPlace(code: String, date: String, placeID: Long): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            return@withContext runCatching {
+                val response = client.post(getUrl(code, Constants.BOOK_URL)) {
+                    contentType(ContentType.Application.Json)
+                    setBody(BookingRequest(date, placeID))
+                }
+                checkResponse(response) {}
+//                if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
+//                    return@runCatching
+//                } else {
+//                    error(response.bodyAsText())
+//                }
+            }
+        }
 
     private fun getUrl(code: String, targetUrl: String) = "${Constants.HOST}/api/$code$targetUrl"
 }

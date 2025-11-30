@@ -14,6 +14,7 @@ import ru.myitschool.work.data.model.Booking
 import ru.myitschool.work.data.repo.MainRepository
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.text.ifEmpty
 
 class MainViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<MainState>(MainState.Loading)
@@ -80,8 +81,10 @@ class MainViewModel : ViewModel() {
                         )
                     }
                 },
-                onFailure = {
-                    _uiState.update { MainState.Error }
+                onFailure = { e ->
+                    _uiState.update {
+                        MainState.Error(e.message?.ifEmpty { "error" } ?: "null error")
+                    }
                 }
             )
         }

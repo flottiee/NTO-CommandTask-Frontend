@@ -56,7 +56,7 @@ fun MainScreen(
             }
         }
     }
-    
+
     // To handle backstack correctly after booking
     LaunchedEffect(navController.currentBackStackEntry) {
         viewModel.onIntent(MainIntent.Refresh)
@@ -85,13 +85,14 @@ fun MainScreen(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+
                 is MainState.Error -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Error",
+                            text = currentState.message,
                             modifier = Modifier.testTag(TestIds.Main.ERROR)
                         )
                         Button(
@@ -102,6 +103,7 @@ fun MainScreen(
                         }
                     }
                 }
+
                 is MainState.Data -> {
                     Column(
                         modifier = Modifier
@@ -125,13 +127,13 @@ fun MainScreen(
                                         contentScale = ContentScale.Crop
                                     )
                                 } else {
-                                     // Placeholder if no image
-                                     Box(
-                                         modifier = Modifier
+                                    // Placeholder if no image
+                                    Box(
+                                        modifier = Modifier
                                             .size(64.dp)
                                             .clip(CircleShape)
                                             .testTag(TestIds.Main.PROFILE_IMAGE)
-                                     )
+                                    )
                                 }
                                 Spacer(modifier = Modifier.size(16.dp))
                                 Text(
@@ -147,7 +149,7 @@ fun MainScreen(
                                 Text("Logout")
                             }
                         }
-                        
+
                         Button(
                             onClick = { viewModel.onIntent(MainIntent.Refresh) },
                             modifier = Modifier
@@ -158,7 +160,7 @@ fun MainScreen(
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
-                        
+
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
