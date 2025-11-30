@@ -90,7 +90,7 @@ class BookViewModel : ViewModel() {
                     }
                 },
                 onFailure = {
-                    _uiState.update { BookState.Error(it.message) }
+                    _uiState.update { BookState.Error("it.message") }
                 }
             )
         }
@@ -131,7 +131,7 @@ class BookViewModel : ViewModel() {
                         _actionFlow.emit(Unit)
                     },
                     onFailure = {
-                        _uiState.update { BookState.Error(it.message) }
+                        _uiState.update { BookState.Error("it.message") }
                     }
                 )
             }
