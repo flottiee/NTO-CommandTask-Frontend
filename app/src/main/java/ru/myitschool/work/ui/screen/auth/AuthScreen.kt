@@ -105,10 +105,6 @@ private fun Content(
             modifier = Modifier.testTag(TestIds.Auth.ERROR),
             color = MaterialTheme.colorScheme.error
         )
-    } else {
-        // This part is tricky. The specs say "element from point 2". Point 2 says "text field with error".
-        // "Not rendered by default".
-        // So `if (state is AuthState.Error)` is correct.
     }
 
     Spacer(modifier = Modifier.size(16.dp))

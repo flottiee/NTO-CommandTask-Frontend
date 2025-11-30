@@ -44,7 +44,8 @@ object NetworkDataSource {
             Log.d("TAG", "response: ${response.status}")
             when (response.status) {
                 HttpStatusCode.OK -> true
-                HttpStatusCode.Unauthorized -> error("Auth error")
+                HttpStatusCode.Unauthorized -> error("кода не существует")
+                HttpStatusCode.BadRequest -> error("что-то пошло не так")
                 else -> error(response.bodyAsText())
             }
         }
