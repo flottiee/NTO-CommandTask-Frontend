@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.myitschool.work.data.repo.AuthRepository
+import ru.myitschool.work.data.source.PreferencesDataSource
 import ru.myitschool.work.domain.auth.CheckAndSaveAuthCodeUseCase
 
 class AuthViewModel : ViewModel() {
@@ -33,17 +35,22 @@ class AuthViewModel : ViewModel() {
                         },
                         onFailure = { error ->
                             error.printStackTrace()
-                            _uiState.update { AuthState.Error(error.message?.ifEmpty { "error" } ?: "null error") }
+                            _uiState.update {
+                                AuthState.Error(error.message?.ifEmpty { "error" } ?: "null error")
+                            }
                         }
                     )
                 }
             }
+
             is AuthIntent.TextInput -> {
                 val isButtonEnabled = isButtonEnabled(intent.text)
                 Log.d("TAG", "viewmodel  process: ${intent}, $isButtonEnabled")
-                _uiState.update { AuthState.Data(
+                _uiState.update {
+                    AuthState.Data(
                         isButtonEnabled = isButtonEnabled
-                    ) }
+                    )
+                }
             }
         }
     }

@@ -42,5 +42,18 @@ object NetworkDataSource {
         }
     }
 
+    suspend fun getInfo(code: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        return@withContext runCatching {
+            Log.d("TAG", "request: $code")
+            val response = client.get(getUrl(code, Constants.INFO_URL))
+            Log.d("TAG", "response: ${response.status}")
+            when (response.status) {
+                HttpStatusCode.OK -> true
+                HttpStatusCode.Unauthorized -> error("Auth error")
+                else -> error(response.bodyAsText())
+            }
+        }
+    }
+
     private fun getUrl(code: String, targetUrl: String) = "${Constants.HOST}/api/$code$targetUrl"
 }

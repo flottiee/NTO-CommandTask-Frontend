@@ -11,6 +11,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import ru.myitschool.work.data.source.PreferencesDataSource
 import ru.myitschool.work.ui.nav.AuthScreenDestination
 import ru.myitschool.work.ui.nav.BookScreenDestination
 import ru.myitschool.work.ui.nav.MainScreenDestination
@@ -21,12 +24,17 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
+    val startDest = runBlocking {
+        if (PreferencesDataSource.userCodeFlow.first()
+                .isEmpty()
+        ) AuthScreenDestination else MainScreenDestination
+    }
     NavHost(
         modifier = modifier,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
         navController = navController,
-        startDestination = AuthScreenDestination,
+        startDestination = startDest,
     ) {
         composable<AuthScreenDestination> {
             AuthScreen(navController = navController)
