@@ -36,7 +36,6 @@ android {
 
 dependencies {
     defaultComposeLibrary()
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0")
     implementation("androidx.navigation:navigation-compose:2.9.6")
