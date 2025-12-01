@@ -44,7 +44,7 @@ fun AuthScreen(
     LaunchedEffect(Unit) {
         viewModel.actionFlow.collect {
             navController.navigate(MainScreenDestination) {
-                 popUpTo(0) { inclusive = true }
+                popUpTo(0) { inclusive = true }
             }
         }
     }
@@ -61,15 +61,7 @@ fun AuthScreen(
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
-        when (val currentState = state) {
-            is AuthState.Data -> Content(viewModel, currentState)
-            is AuthState.Error -> Content(viewModel, currentState)
-            is AuthState.Loading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(64.dp)
-                )
-            }
-        }
+        Content(viewModel, state)
     }
 }
 
@@ -79,10 +71,12 @@ private fun Content(
     state: AuthState,
 ) {
     var inputText by rememberSaveable { mutableStateOf("") }
-    
+
     Spacer(modifier = Modifier.size(16.dp))
     TextField(
-        modifier = Modifier.testTag(TestIds.Auth.CODE_INPUT).fillMaxWidth(),
+        modifier = Modifier
+            .testTag(TestIds.Auth.CODE_INPUT)
+            .fillMaxWidth(),
         value = inputText,
         onValueChange = {
             Log.d("TAG", "text=$it")
@@ -93,13 +87,7 @@ private fun Content(
         isError = state is AuthState.Error
     )
     Spacer(modifier = Modifier.size(16.dp))
-    
-    // We always render the error text field, but it might be empty if no error.
-    // Or specs say "По умолчанию неотображаемое текстовое поле с ошибкой ... Отметим, что это поле не должно рендериться."
-    // "не должно рендериться" means we should use `if` condition.
-    // But wait, "По умолчанию неотображаемое" implies visibility is gone or it's just not in composable tree.
-    // "не должно рендериться" = not in tree.
-    
+
     if (state is AuthState.Error) {
         Text(
             text = state.errorText,
@@ -109,20 +97,28 @@ private fun Content(
     }
 
     Spacer(modifier = Modifier.size(16.dp))
-    
-    val isEnabled = when(state) {
+
+    val isEnabled = when (state) {
         is AuthState.Data -> state.isButtonEnabled
-        is AuthState.Error -> true 
+        is AuthState.Error -> true
         else -> false
     }
 
     Button(
-        modifier = Modifier.testTag(TestIds.Auth.SIGN_BUTTON).fillMaxWidth(),
+        modifier = Modifier
+            .testTag(TestIds.Auth.SIGN_BUTTON)
+            .fillMaxWidth(),
         onClick = {
             viewModel.onIntent(AuthIntent.Send(inputText))
         },
         enabled = isEnabled
     ) {
         Text(stringResource(R.string.auth_sign_in))
+    }
+
+    if (state is AuthState.Loading) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(64.dp)
+        )
     }
 }
